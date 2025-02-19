@@ -1,0 +1,132 @@
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+// count how many fish per region per year
+let west_data = await d3.csv("western_subset.csv", d3.autoType);
+let east_data = await d3.csv("eastern_subset.csv", d3.autoType);
+
+console.log(west_data, east_data)
+
+
+//
+let west_min = d3.min(west_data, d => d.date_year)
+let west_max = d3.max(west_data, d => d.date_year)
+// console.log(west_min, west_max)
+// console.log(typeof west_min, typeof west_max)
+
+let east_min = d3.min(east_data, d => d.date_year)
+let east_max = d3.max(east_data, d => d.date_year)
+// console.log(east_min, east_max)
+//
+let min_year = d3.min([west_min, east_min])
+let max_year = d3.max([west_max, east_max])
+console.log(min_year, max_year)
+
+
+// Count occurrences of each year using d3.rollup()
+let west_counts = d3.rollup(west_data, v => v.length, d => d.date_year);
+let east_counts = d3.rollup(east_data, v => v.length, d => d.date_year);
+
+// Convert Map to JSON object
+let west_json = Object.fromEntries(west_counts);
+let east_json = Object.fromEntries(east_counts);
+
+console.log("Western Data Count by Year:", west_json);
+console.log("Eastern Data Count by Year:", east_json);
+
+
+// Get all counts from both objects
+let west_cts = Object.values(west_json);
+let east_cts = Object.values(east_json);
+
+// Combine all counts into a single array
+let all_counts = [...west_cts, ...east_cts];
+
+// Find the overall min and max counts
+let minCount = d3.min(all_counts);
+let maxCount = d3.max(all_counts);
+
+console.log(`Min Count: ${minCount}, Max Count: ${maxCount}`);
+
+let cachedSVG = null; // Store the fetched SVG in memory
+
+async function loadSVG(url) {
+    if (cachedSVG) return cachedSVG.cloneNode(true); // Return a clone if already fetched
+
+    try {
+        let response = await fetch(url);
+        if (!response.ok) throw new Error("Failed to load SVG");
+
+        let svgText = await response.text();
+        let tempContainer = document.createElement("div");
+        tempContainer.innerHTML = svgText;
+
+        let svgElement = tempContainer.querySelector("svg");
+        if (!svgElement) throw new Error("Invalid SVG file");
+
+        cachedSVG = svgElement; // Store for future use
+        return cachedSVG.cloneNode(true);
+    } catch (error) {
+        console.error("Error loading SVG:", error);
+        return null;
+    }
+}
+
+// Function to insert SVG multiple times
+async function insertSVG(targetId, datasetType, year, count) {
+    let container = document.getElementById(targetId);
+
+    // Scale for positioning (year → x-axis)
+    let xScale = d3
+        .scaleTime()
+        .domain([1940, 2035]) // Min & max year
+        .range([0, 100]);      // SVG positions from 0 to 500px
+
+    // Scale for size (count → size)
+    let sizeScale = d3
+        .scaleLinear()
+        .domain([minCount, maxCount])  // Min & max count
+        .range([0.1, 2]); // SVGs scale between 0.5x and 2x
+
+    let svg = await loadSVG("lionfish3.svg");
+    if (svg) {
+        // Set class to "east" or "west" for each <path> inside the SVG
+        svg.querySelectorAll("path").forEach(el => el.setAttribute("class", datasetType));
+
+        // Compute position based on year
+        let xPosition = xScale(year);
+
+        // Compute scale size based on count
+        let scaleValue = sizeScale(count);
+
+        // Apply transform with translation & scaling
+        console.log(`Year: ${year}, Count: ${count}`);
+
+        svg.setAttribute("transform", `translate(${xPosition}, 10) scale(${scaleValue})`);
+
+        // Append the modified SVG to the container
+        container.appendChild(svg);
+    }
+}
+
+function insertAllSVGs(targetId, datasetType, countObject) {
+    Object.keys(countObject).forEach(year => {
+        insertSVG(targetId, datasetType, +year, countObject[year]);
+    });
+}
+
+
+
+
+insertAllSVGs("svg-container", "west", west_json);
+insertAllSVGs("svg-container", "east", east_json);
+
+
+// Example usage: Insert 5 SVGs with red stroke
+// insertSVG("svg-container", "east", 2020, 5);
+// insertSVG("svg-container", "west", 1950, 20);
+// for (let item of west_json) {
+//     insertSVG("svg-container", "west", item[0], item[1]);
+// }
+// for (let item of east_json) {
+//     insertSVG("svg-container", "east", item[0], item[1]);
+// }

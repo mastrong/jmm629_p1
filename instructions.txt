@@ -1,0 +1,26 @@
+In this project, you will create one or more customized graphics using <div>, <svg>, or <canvas> elements.
+
+Sometimes, we want to design a specific type of graphic for the web, perhaps one that cannot be generated using standard
+tools such as Google Sheets, Flourish, or RawGRAPHs. In such cases, gaining a solid understanding of the fundamental
+mechanisms for creating images on the web can be highly advantageous.
+
+This project is an opportunity for you to experiment with creating graphics. You can choose to create bar charts, maps,
+lines, pictograms, or any other format you desire. The choice of graphic and technology is entirely up to you.
+
+As starting points, here are 3 suggestions for you:
+
+Start with a question (e.g., Which pop singers have the longest songs? or How rent prices have increased in Miami in thepast decade?);
+Start with a dataset (e.g., OBIS.org or a new report you want to analyze);
+Start with a visual inspiration (e.g., You found an interesting chart you want to mimic)
+
+The main evaluation criteria for this project are as follows:
+
+Creativity: Does your graphic exhibit original or innovative elements in terms of concept, interaction, animation, etc.?
+Technical Proficiency: Does your website function seamlessly without errors on at least one type of device?
+Aesthetics: Does your project demonstrate refined visual styles and presentation?
+
+Your submission should include the following:
+
+A public link to the project (on platforms like GitHub Pages or others)
+A paragraph that describes your experience during the creation process, including any challenges faced and lessons learned
+Any supplementary materials (e.g., drafts, prototypes) that help convey your idea or design process
